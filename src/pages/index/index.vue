@@ -38,6 +38,8 @@
       :setting="setting"
       @update:showSettingModal="showSettingModal = $event"
       @vocationChange="vocationChange"
+      @vocationStartMonthChange="vocationStartMonthChange"
+      @vocationEndMonthChange="vocationEndMonthChange"
       @saveSetting="saveSetting"
     />
   </view>
@@ -78,6 +80,8 @@ const {
   hideSettingModal,
   displaySetting,
   vocationChange,
+  vocationStartMonthChange,
+  vocationEndMonthChange,
   saveSetting,
   getSetting
 } = useSetting()
@@ -86,5 +90,18 @@ onMounted(() => {
   defaultDay.value = getFirstDayOfMonth()
   checkedDate.value = defaultDay.value
   getMonthInfo()
+  
+  // 检查是否有设置，如果没有则弹出设置弹窗
+  uni.getStorage({
+    key: 'setting',
+    success: (res) => {
+      if (!res.data || !res.data.vocation) {
+        displaySetting()
+      }
+    },
+    fail: () => {
+      displaySetting()
+    }
+  })
 })
 </script>
