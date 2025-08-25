@@ -46,6 +46,7 @@ export function useCalendar() {
   }
 
   const getMonthInfo = (month = '') => {
+    uni.showLoading({title: '加载中...'})
     uni.request({
       url: `/api/calendar?month=${month}`,
       method: 'GET',
@@ -79,6 +80,9 @@ export function useCalendar() {
           calendarChange({ fulldate: month + '-01' })
           defaultDay.value = month + '-01'
         }
+      },
+      complete: () => {
+        uni.hideLoading()
       }
     })
   }
