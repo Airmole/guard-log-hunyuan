@@ -14,7 +14,7 @@ export async function onRequest(context) {
   
   let result = [];
 
-  const mockData = 'https://gist.githubusercontent.com/Airmole/4d44f4877017a9085f1a9c2a6fb4bf5d/raw/2ad6974d18582600bb5b5e74a7195217889d9b19/guard-log.json';
+  const mockData = 'https://gist.githubusercontent.com/Airmole/4d44f4877017a9085f1a9c2a6fb4bf5d/raw/7bf071baf22ddd65f3d4f7c71535cee3d41fc013/guard-log.json';
   const response = await fetch(mockData);
   const json = await response.json();
   
