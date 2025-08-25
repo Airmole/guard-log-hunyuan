@@ -49,7 +49,7 @@ export function useCalendar() {
   }
 
   const monthChange = (e) => {
-    getMonthInfo(e.fullDate)
+    // getMonthInfo(e.fullDate)
   }
 
   const refreshCalendar = () => {
