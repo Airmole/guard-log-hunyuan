@@ -88,7 +88,7 @@ export function useCalendar() {
                 
                 messages.push({
                   date: day.date,
-                  info: info,
+                  info: info || '　',
                   infoColor: '#3c9cff',
                   topInfo: weatherText,
                   topInfoColor: '#3c9cff',
