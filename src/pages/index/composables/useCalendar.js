@@ -58,7 +58,8 @@ export function useCalendar() {
               let weatherText = day.weather
               if (weatherText.length > 4) {
                 const weatherPattern = /^[\u4e00-\u9fa5]+/
-                weatherText = weatherPattern.test(day.weather)
+                weatherText = weatherPattern.exec(day.weather)
+                weatherText = weatherText ? weatherText[0] : ''
               }
               messages.push({
                 date: day.date,
