@@ -53,12 +53,13 @@ export async function onRequest(context) {
 }
 
 /**
- * 调用腾讯云混元大模型API生成护林员巡护日志
+ * 调用腾讯云混元大模型API生成护林员巡护日志（使用OpenAI兼容接口）
  */
 async function generateGuardLog(context, date, weather, wind, isMeeting, isHoliday, keywords) {
   try {
     // 构建提示词
-    const prompt = `
+    const systemPrompt = "你是一名护林员助手，负责根据提供的信息生成简洁的护林员巡护日志。";
+    const userPrompt = `
 请根据以下信息生成一份护林员巡护日志，字数控制在一百字以内：
 日期：${date}
 天气：${weather}
@@ -75,34 +76,31 @@ ${keywords ? `活动关键字：${keywords}` : ''}
 - 护林员签名（可虚拟）
 `;
     
-    // 腾讯云混元大模型API配置
+    // 腾讯云混元大模型API配置（OpenAI兼容接口）
     const API_KEY = context.env.HUNYUAN_API_KEY; // 从环境变量获取API密钥
-    const API_ENDPOINT = 'https://hunyuan.tencentcloudapi.com';
-    const MODEL_NAME = 'hunyuan-lite'; // 混元大模型名称，根据实际情况选择
+    const API_ENDPOINT = context.env.HUNYUAN_API_ENDPOINT || 'https://api.hunyuan.tencentcloud.com/v1/chat/completions';
+    const MODEL_NAME = context.env.HUNYUAN_MODEL || 'hunyuan-lite'; // 混元大模型名称
     
-    // 构建API请求参数
+    // 构建OpenAI兼容格式的请求参数
     const requestBody = {
-      Model: MODEL_NAME,
-      Prompt: prompt,
-      MaxTokens: 200, // 限制生成字数
-      Temperature: 0.7, // 控制生成内容的随机性
-      TopP: 0.9, // 控制生成内容的多样性
-      StopSequences: []
+      model: MODEL_NAME,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      max_tokens: 200, // 限制生成字数
+      temperature: 0.7, // 控制生成内容的随机性
+      top_p: 0.9, // 控制生成内容的多样性
+      n: 1,
+      stream: false
     };
     
-    // 生成签名（腾讯云API通常需要签名）
-    // 注意：实际签名生成逻辑需要根据腾讯云官方文档实现
-    // 这里简化处理，实际项目中需要按照腾讯云API签名规范生成
-    
-    // 发送API请求
+    // 发送API请求（使用OpenAI兼容接口格式）
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`, // 假设使用Bearer认证
-        'X-TC-Timestamp': Math.floor(Date.now() / 1000).toString(),
-        'X-TC-Version': '2023-09-01',
-        'X-TC-Region': 'ap-guangzhou'
+        'Authorization': `Bearer ${API_KEY}` // OpenAI标准认证方式
       },
       body: JSON.stringify(requestBody)
     });
@@ -114,14 +112,12 @@ ${keywords ? `活动关键字：${keywords}` : ''}
     
     const data = await response.json();
     
-    // 解析返回结果（根据实际API返回格式调整）
+    // 解析OpenAI格式的返回结果
     let generatedLog = '';
-    if (data.Response && data.Response.Choices && data.Response.Choices.length > 0) {
-      generatedLog = data.Response.Choices[0].Text.trim();
-    } else if (data.result) {
-      generatedLog = data.result.trim();
+    if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+      generatedLog = data.choices[0].message.content.trim();
     } else {
-      throw new Error('API返回格式不符合预期');
+      throw new Error('OpenAI兼容接口返回格式不符合预期');
     }
     
     return generatedLog;
