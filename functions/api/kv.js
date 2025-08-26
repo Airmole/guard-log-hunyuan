@@ -8,10 +8,21 @@ export async function onRequest(context) {
   const response = await fetch(request);
   const json = await response.json();
 
+  let result;
+    let cursor;
+    do {
+        result = await guardlog_kv.list();
+        cursor = result.cursor;
+        for (let index = 0; index < result.keys.length; index++) {
+            const keyname = result.keys[index].key;
+            await guardlog_kv.delete(keyname);
+        }
+    } while (result && !result.complete);
+
   for (const month in json) {
     for (let index = 0; index < json[month].length; index++) {
         const day = json[month][index];
-        await guardlog_kv.put(`clendar${day.date}`, JSON.stringify(day))
+        await guardlog_kv.put(`clendar_${day.date}`, JSON.stringify(day))
     }
   }
 
