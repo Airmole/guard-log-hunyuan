@@ -87,9 +87,14 @@ export function useCalendar() {
                 info = '休假'
               }
               // 检查是否为代班工作日
-              if (info === '' && isSubstituteDay(day.date, setting)) {  
+              if (info === '' && isSubstituteDay(day.date, setting)) {
                 info = '代班'
               }
+
+              const dateObj = new Date(day.date)
+              const year = dateObj.getFullYear()
+              const month = dateObj.getMonth() + 1
+              const dayOfMonth = dateObj.getDate()
 
               messages.push({
                 date: day.date,
@@ -100,16 +105,20 @@ export function useCalendar() {
                 weather: day.weather,
                 wind: day.wind,
                 event: day.event,
+                weekday: getWeekdayChinese(day.date),
+                year: year,
+                month: month,
+                day: dayOfMonth,
               })
             }
 
             calendarMessage.value = messages
-            
+
             // 自动选中当月第一天
             const firstDay = month ? month + '-01' : getFirstDayOfMonth();
             checkedDate.value = firstDay;
             defaultDay.value = firstDay;
-            
+
             // 触发日历变化事件
             const foundDay = messages.find(day => day.date === firstDay);
             checkedDay.value = foundDay || '';
@@ -150,7 +159,7 @@ export function useCalendar() {
   // 检查是否为为休假同事代班
   const isSubstituteDay = (dateStr, setting) => {
     if (!setting || !setting.vocation) return false
-    
+
     const date = new Date(dateStr)
     const month = date.getMonth() + 1
     const day = date.getDate()
@@ -159,7 +168,7 @@ export function useCalendar() {
     if (month < setting.vocationStartMonth || month > setting.vocationEndMonth) {
       return false
     }
-    
+
     // 设置的休假期间由同事代班，则该日期为休假同事代班
     if (setting.vocation === '0') {
       return day >= 8 && day <= 16
@@ -168,6 +177,18 @@ export function useCalendar() {
     }
 
     return false
+  }
+
+  const getWeekdayChinese = (dateStr) => {
+    const date = new Date(dateStr);
+
+    // 验证日期有效性
+    if (isNaN(date.getTime())) {
+      throw new Error('无效的日期格式，请使用YYYY-MM-DD格式');
+    }
+
+    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    return weekdays[date.getDay()];
   }
 
   return {
