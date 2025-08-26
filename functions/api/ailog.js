@@ -71,9 +71,9 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
     }
   }
 
-  if (isHoliday && substituteName) {
+  if (isHoliday) {
     systemPrompt = systemPrompt + '如果公休，则只需说清楚由代班同事负责即可，无需写巡护内容。';
-    specialInstructions += `今天轮我公休，管护区的巡护工作由同事${substituteName}负责代班巡护，全权负责。`;
+    specialInstructions += `今天轮我公休，管护区的巡护工作由同事${substituteName?substituteName:''}负责代班巡护，全权负责。`;
     return {
       systemPrompt,
       userPrompt: specialInstructions
@@ -86,6 +86,8 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
       systemPrompt,
       userPrompt: specialInstructions
     }
+  } else {
+    specialInstructions += "不要出现今天日期和天气信息";
   }
 
   let element = "";
