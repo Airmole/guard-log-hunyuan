@@ -9,6 +9,7 @@ export async function onRequest(context) {
   
   let response = await cache.match(request);
   // 缓存不存在，重新获取远程资源
+  if (!response) response = await fetch(request);
   const json = response.json()
 
   for (const month in json) {
