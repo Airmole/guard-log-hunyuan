@@ -65,7 +65,7 @@ export function useCalendar() {
     // 先获取设置，然后再请求日历数据
     getSetting().then(setting => {
       uni.request({
-        url: `/api/calendar?month=${month}`,
+        url: `http://localhost:8088/api/calendar?month=${month}`,
         method: 'GET',
         success: (res) => {
           if (res.data) {

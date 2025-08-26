@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, onMounted } from 'vue';
 
 // 定义props
 const props = defineProps({
@@ -49,6 +49,19 @@ const props = defineProps({
 const guardLog = ref('');
 const generating = ref(false);
 const error = ref('');
+const substituteName = ref('');
+
+// 获取代班同事姓名设置
+onMounted(async () => {
+  try {
+    const setting = await uni.getStorage({ key: 'setting' });
+    if (setting.data && setting.data.partner) {
+      substituteName.value = setting.data.partner;
+    }
+  } catch (error) {
+    console.log('未找到代班同事设置');
+  }
+});
 
 /**
  * 生成护林员日志
@@ -58,6 +71,8 @@ function generateGuardLog() {
     error.value = '请先选择有效的日期';
     return;
   }
+
+  console.log(props.checkedDay)
   
   guardLog.value = '';
   error.value = '';
@@ -66,14 +81,15 @@ function generateGuardLog() {
   // 构建API请求参数
   const params = new URLSearchParams();
   params.append('date', props.checkedDate);
-  params.append('weather', props.checkedDay.weather || '晴朗');
-  params.append('wind', props.checkedDay.wind || '微风');
-  params.append('isMeeting', (props.checkedDay.event && props.checkedDay.event.includes('会议')) ? 'true' : 'false');
+  params.append('weather', props.checkedDay.weather || '');
+  params.append('wind', props.checkedDay.wind || '');
+  params.append('isMeeting', props.checkedDay.info.includes('护林例会') ? 'true' : 'false');
   params.append('isHoliday', props.checkedDay.info === '休假' ? 'true' : 'false');
+  params.append('substituteName', substituteName.value || '');
   params.append('keywords', props.checkedDay.event || '');
   
   // 构建API URL
-  const apiUrl = `/api/ailog?${params.toString()}`;
+  const apiUrl = `http://localhost:8088/api/ailog?${params.toString()}`;
   
   // 创建SSE连接
   const eventSource = new EventSource(apiUrl);
