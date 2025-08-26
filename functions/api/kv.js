@@ -4,13 +4,9 @@ export async function onRequest(context) {
   
   // 资源地址，也作为缓存键
   const request = new Request(dataUrl);
-  // 缓存默认实例
-  const cache = caches.default;
-  
-  let response = await cache.match(request);
   // 缓存不存在，重新获取远程资源
-  if (!response) response = await fetch(request);
-  const json = response.json()
+  const response = await fetch(request);
+  const json = await response.json();
 
   for (const month in json) {
     for (let index = 0; index < json[month].length; index++) {
@@ -20,5 +16,5 @@ export async function onRequest(context) {
   }
 
 
-  return new Response("ok", {});
+  return new Response(JSON.stringify(json));
 }
