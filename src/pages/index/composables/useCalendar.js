@@ -54,18 +54,18 @@ export function useCalendar() {
 
   const refreshCalendar = () => {
     if (defaultDay.value) {
-      const currentYear = defaultDay.value.substring(0, 4)
-      getMonthInfo(currentYear)
+      const currentMonth = defaultDay.value.substring(0, 7)
+      getMonthInfo(currentMonth)
     }
   }
 
-  const getMonthInfo = (year = '') => {
+  const getMonthInfo = (month = '') => {
     uni.showLoading({ title: '加载中...' })
 
     // 先获取设置，然后再请求日历数据
     getSetting().then(setting => {
       uni.request({
-        url: `/api/calendar?year=${year}`,
+        url: `/api/calendar?month=${month}`,
         method: 'GET',
         success: (res) => {
           if (res.data) {
