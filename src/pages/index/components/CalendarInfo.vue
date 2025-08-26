@@ -36,7 +36,7 @@
 				<view class="text-center text-orange">请自行注意判断是否符合实际情况可用！</view>
 				
 				<view class="flex justify-center margin-top-sm">
-					<button class="cu-btn sm round line-blue shadow" @click="generateGuardLog" :disabled="generating">
+					<button class="cu-btn sm round bg-blue shadow" @click="generateGuardLog" :disabled="generating">
 						<text class="cuIcon cuIcon-refresh margin-right-xs"></text> {{ generating ? '生成中...' : '重新生成' }}
 					</button>
 				</view>
