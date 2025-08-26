@@ -9,16 +9,21 @@ export async function onRequest(context) {
     year = new Date().getFullYear();
   }
 
-  let keys = await guardlog_kv.list({ "prefix": `clendar_${year}`, "limit": 370 });
-
-  let result = [];
-  for (let index = 0; index < keys.keys.length; index++) {
-    const key = keys.keys[index].key;
-    const value = await guardlog_kv.get(key, 'json');
-    result.push(value);
-  }
-
-  return new Response(JSON.stringify(result), {
+ 
+  let clendarData = [];
+  let result;
+  let cursor;
+  do {
+      result = await guardlog_kv.list({ "prefix": `clendar_${year}`, "limit": 200 });
+      cursor = result.cursor;
+      for (let index = 0; index < result.keys.length; index++) {
+          const keyname = result.keys[index].key;
+          const value = await guardlog_kv.get(keyname, 'json');
+          clendarData.push(value);
+      }
+  } while (result && !result.complete);
+  
+  return new Response(JSON.stringify(clendarData), {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,HEAD,POST,DELETE,PUT,OPTIONS",
