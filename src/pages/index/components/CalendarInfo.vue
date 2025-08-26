@@ -15,6 +15,7 @@
           <view class='cu-tag bg-blue'>风力</view>
           <view class="cu-tag line-blue">{{ checkedDay.wind }}</view>
         </view>
+        <view v-if="checkedDay.info == '休假'" class="cu-tag line-blue margin-lr-xs">{{ checkedDay.info }}</view>
         <view v-if="checkedDay.event" class="cu-tag line-blue margin-lr-xs">{{ checkedDay.event }}</view>
       </view>
     </template>
