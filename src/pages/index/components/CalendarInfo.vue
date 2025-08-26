@@ -38,9 +38,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, defineProps } from 'vue';
 
-defineProps({
+// 定义props
+const props = defineProps({
   checkedDate: String,
   checkedDay: [String, Object]
 });
@@ -53,7 +54,7 @@ const error = ref('');
  * 生成护林员日志
  */
 function generateGuardLog() {
-  if (!checkedDay || typeof checkedDay === 'string') {
+  if (!props.checkedDay || typeof props.checkedDay === 'string') {
     error.value = '请先选择有效的日期';
     return;
   }
@@ -64,12 +65,12 @@ function generateGuardLog() {
   
   // 构建API请求参数
   const params = new URLSearchParams();
-  params.append('date', checkedDate);
-  params.append('weather', checkedDay.weather || '晴朗');
-  params.append('wind', checkedDay.wind || '微风');
-  params.append('isMeeting', (checkedDay.event && checkedDay.event.includes('会议')) ? 'true' : 'false');
-  params.append('isHoliday', checkedDay.info === '休假' ? 'true' : 'false');
-  params.append('keywords', checkedDay.event || '');
+  params.append('date', props.checkedDate);
+  params.append('weather', props.checkedDay.weather || '晴朗');
+  params.append('wind', props.checkedDay.wind || '微风');
+  params.append('isMeeting', (props.checkedDay.event && props.checkedDay.event.includes('会议')) ? 'true' : 'false');
+  params.append('isHoliday', props.checkedDay.info === '休假' ? 'true' : 'false');
+  params.append('keywords', props.checkedDay.event || '');
   
   // 构建API URL
   const apiUrl = `/api/ailog?${params.toString()}`;
