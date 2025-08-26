@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="padding-bottom-xl">
     <view class="cu-bar bg-white">
       <view class="action">
         <text class="cuIcon-title text-green"></text>
