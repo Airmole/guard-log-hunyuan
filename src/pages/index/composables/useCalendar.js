@@ -84,11 +84,11 @@ export function useCalendar() {
               // 检查是否为公休日
               let info = day.keyword
               if (isVocationDay(day.date, setting)) {
-                info = '休假日'
+                info = '休假'
               }
               // 检查是否为代班工作日
               if (info === '' && isSubstituteDay(day.date, setting)) {  
-                info = '代班巡护'
+                info = '代班'
               }
 
               messages.push({

@@ -110,9 +110,9 @@ function generateGuardLog() {
   params.append('weather', props.checkedDay.weather || '');
   params.append('wind', props.checkedDay.wind || '');
   params.append('isMeeting', props.checkedDay.info.includes('护林例会') ? 'true' : 'false');
-  params.append('isHoliday', props.checkedDay.info === '休假' ? 'true' : 'false');
+  params.append('isHoliday', props.checkedDay.info.includes('休假') ? 'true' : 'false');
   params.append('substituteName', substituteName.value || '');
-  params.append('isSubstitute', props.checkedDay.info.includes('代班巡护') ? 'true' : 'false');
+  params.append('isSubstitute', props.checkedDay.info.includes('代班') ? 'true' : 'false');
   params.append('keywords', props.checkedDay.event || '');
   
   // 构建API URL
