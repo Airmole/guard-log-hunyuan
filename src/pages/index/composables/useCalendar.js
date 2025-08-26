@@ -50,6 +50,8 @@ export function useCalendar() {
 
   const monthChange = (e) => {
     getMonthInfo(e.fullDate)
+    // 月份切换时自动选中第一天
+    checkedDate.value = e.fullDate + '-01'
   }
 
   const refreshCalendar = () => {
@@ -65,7 +67,7 @@ export function useCalendar() {
     // 先获取设置，然后再请求日历数据
     getSetting().then(setting => {
       uni.request({
-        url: `http://localhost:8088/api/calendar?month=${month}`,
+        url: `/api/calendar?month=${month}`,
         method: 'GET',
         success: (res) => {
           if (res.data) {
@@ -74,7 +76,7 @@ export function useCalendar() {
             for (let day of res.data) {
               let weatherText = day.weather
               if (weatherText.length > 4) {
-                const weatherPattern = /^[\u4e00-\u9fa5]+/
+                const weatherPattern = /[\u4e00-\u9fa5]+/
                 weatherText = weatherPattern.exec(day.weather)
                 weatherText = weatherText ? weatherText[0] : ''
               }
@@ -82,7 +84,11 @@ export function useCalendar() {
               // 检查是否为公休日
               let info = day.keyword
               if (isVocationDay(day.date, setting)) {
-                info = '休假'
+                info = '休假日'
+              }
+              // 检查是否为代班工作日
+              if (info === '' && isSubstituteDay(day.date, setting)) {  
+                info = '代班巡护'
               }
 
               messages.push({
@@ -98,12 +104,17 @@ export function useCalendar() {
             }
 
             calendarMessage.value = messages
+            
+            // 自动选中当月第一天
+            const firstDay = month ? month + '-01' : getFirstDayOfMonth();
+            checkedDate.value = firstDay;
+            defaultDay.value = firstDay;
+            
+            // 触发日历变化事件
+            const foundDay = messages.find(day => day.date === firstDay);
+            checkedDay.value = foundDay || '';
           } else {
             if (res.data.message) uni.showToast({ title: res.data.message, icon: 'none' })
-          }
-          if (month) {
-            calendarChange({ fulldate: month + '-01' })
-            defaultDay.value = month + '-01'
           }
         },
         complete: () => {
@@ -131,6 +142,29 @@ export function useCalendar() {
       return day >= 1 && day <= 8
     } else if (setting.vocation === '1') {
       return day >= 9 && day <= 16
+    }
+
+    return false
+  }
+
+  // 检查是否为为休假同事代班
+  const isSubstituteDay = (dateStr, setting) => {
+    if (!setting || !setting.vocation) return false
+    
+    const date = new Date(dateStr)
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+
+    // 检查月份是否在公休月份范围内
+    if (month < setting.vocationStartMonth || month > setting.vocationEndMonth) {
+      return false
+    }
+    
+    // 设置的休假期间由同事代班，则该日期为休假同事代班
+    if (setting.vocation === '0') {
+      return day >= 8 && day <= 16
+    } else if (setting.vocation === '1') {
+      return day >= 1 && day <= 8
     }
 
     return false

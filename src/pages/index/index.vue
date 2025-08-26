@@ -29,6 +29,7 @@
     ></wu-calendar>
     
     <CalendarInfo 
+      ref="calendarInfoRef"
       :checkedDate="checkedDate" 
       :checkedDay="checkedDay" 
     />
@@ -46,11 +47,13 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onBeforeMount, ref, watch } from 'vue'
 import { useCalendar } from './composables/useCalendar'
 import { useSetting } from './composables/useSetting'
 import CalendarInfo from './components/CalendarInfo.vue'
 import SettingModal from './components/SettingModal.vue'
+
+const calendarInfoRef = ref(null);
 
 const {
   defaultDay,
@@ -86,6 +89,11 @@ const {
   getSetting
 } = useSetting()
 
+onBeforeMount(() => {
+  defaultDay.value = getFirstDayOfMonth()
+  checkedDate.value = defaultDay.value
+})
+
 onMounted(() => {
   defaultDay.value = getFirstDayOfMonth()
   checkedDate.value = defaultDay.value
@@ -103,5 +111,15 @@ onMounted(() => {
       displaySetting()
     }
   })
+})
+
+// 监听日历数据加载完成，自动生成日志
+watch(() => checkedDay.value, (newVal) => {
+  if (newVal && calendarInfoRef.value) {
+    // 延迟一下确保组件渲染完成
+    setTimeout(() => {
+      calendarInfoRef.value.autoGenerateLog()
+    }, 100)
+  }
 })
 </script>
