@@ -48,7 +48,7 @@
 
 			<view class="margin-top-xl">
 				<view class="text-center text-orange">巡护日志由腾讯混元AI大模型生成</view>
-				<view class="text-center text-orange">请自行注意判断是否符合实际情况可用！</view>
+				<view class="text-center text-orange">请注意自行判断是否符合实际情况可用！</view>
 				
 				<view class="flex justify-center margin-top-sm">
 					<button class="cu-btn sm round bg-blue shadow" @click="generateGuardLog" :disabled="generating">
