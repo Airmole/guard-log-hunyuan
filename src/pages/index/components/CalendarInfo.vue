@@ -1,12 +1,26 @@
 <template>
-	<view class="cu-list menu sm-border card-menu margin-sm bg-white">
-		<view class="text-center text-xl margin-tb-xs">{{ checkedDate }}</view>
+	<view class="cu-list menu sm-border card-menu margin-tb-sm bg-white">
+		<view class="text-center text-xl margin-top-xs">{{ checkedDate }}</view>
 		<view v-if="checkedDay==''" class="text-center">
 			<image style="height: 200rpx;" src="https://r2.airmole.cn/i/2025/05/02/%E7%82%92%E9%A5%AD.gif"
 				mode="heightFix"></image>
 			<view class="text-xl margin-tb-sm">数据待更新</view>
 		</view>
-		<view v-else class="padding-xs">
+		<view v-else class="padding-lr-xs padding-bottom-sm">
+			<view class="margin-tb-xs">
+				<view class="cu-capsule radius">
+				    <view class='cu-tag bg-blue'>天气</view>
+				    <view class="cu-tag line-bliue">{{checkedDay.weather}}</view>
+				</view>
+				<view v-if="checkedDay.wind" class="cu-capsule radius margin-lr-xs">
+					<view class='cu-tag bg-blue'>风力</view>
+					<view class="cu-tag line-bliue">{{checkedDay.wind}}</view>
+				</view>
+				<view v-if="checkedDay.weekday" class="cu-tag line-blue margin-lr-xs">{{checkedDay.weekday}}</view>
+				<view v-if="checkedDay.info && checkedDay.info !== '　'" class="cu-tag line-blue margin-lr-xs">{{checkedDay.info}}</view>
+				<view v-if="checkedDay.event" class="cu-tag line-blue margin-lr-xs">{{checkedDay.event}}</view>
+			</view>
+			<view class="margin-tb-xs"><hr /></view>
 			<view class="flex text-center border">
 				<view class="flex-sub padding-xs border"><span class="text-blue">{{ checkedDay.month }}</span>月<span
 						class="text-blue">{{ checkedDay.day }}</span>日</view>
@@ -21,8 +35,9 @@
 			<view class="flex text-left border">
 				<view class="flex-sub padding-xs">
 					<text>巡查结果：</text>
-					<view v-if="guardLog" style="text-indent: 2em;">
-						<text :decode="true">{{ guardLog }}</text>
+					<view style="text-indent: 2em;">
+						<text v-if="generating" class="text-red">正在生成中...</text>
+						<text v-else :decode="true">{{ guardLog }}</text>
 					</view>
 				</view>
 			</view>
@@ -121,10 +136,6 @@
 			return;
 		}
 
-		uni.showLoading({
-			title: '日志生成中...'
-		})
-
 		console.log(props.checkedDay)
 
 		guardLog.value = '';
@@ -165,7 +176,6 @@
 			// 关闭连接并重置状态
 			eventSource.close();
 			generating.value = false;
-			uni.hideLoading();
 		};
 
 

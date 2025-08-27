@@ -1,5 +1,5 @@
 <template>
-  <view class="padding-bottom-xl">
+  <view>
     <view class="cu-bar bg-white">
       <view class="action">
         <text class="cuIcon-title text-green"></text>
@@ -43,6 +43,12 @@
       @vocationEndMonthChange="vocationEndMonthChange"
       @saveSetting="saveSetting"
     />
+	
+	<view class="flex justify-center flex-direction align-center margin-tb-xl">
+		<view class='cu-avatar round margin-right-xs' :style="`background-image: url(${airmoleAvatar});`"></view>
+		<view><text>Airmole.</text></view>
+		<view><text class="text-xs">陇ICP备17001242号-2</text></view>
+	</view>
   </view>
 </template>
 
@@ -54,6 +60,7 @@ import CalendarInfo from './components/CalendarInfo.vue'
 import SettingModal from './components/SettingModal.vue'
 
 const calendarInfoRef = ref(null);
+const airmoleAvatar = ref('https://r2.airmole.cn/avatar.jpg')
 
 const {
   defaultDay,

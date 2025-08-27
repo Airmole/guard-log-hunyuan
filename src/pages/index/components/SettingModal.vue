@@ -1,20 +1,24 @@
 <template>
   <view class="cu-modal bottom-modal" :class="showSettingModal?'show':''" style="z-index: 99;">
     <view class="cu-dialog">
-      <view class="cu-bar justify-center"><view class="text-center">生成设置</view></view>
+      <view class="cu-bar bg-white">
+		  <view class="action"></view>
+		  <view class="action text-center">生成设置</view>
+		  <view class="action"><text @tap="hideSettingModal" class="cuIcon cuIcon-close text-red"></text></view>
+	  </view>
       <view class="padding-lr-sm padding-bottom">
-        <view class="text-left">
+        <view class="text-left margin-top-sm">
           设置休假日期和代班同事，以生成更合理的巡护日志
         </view>
         <view class="cu-form-group margin-top">
           <view class="title">公休月份</view>
-          <view class="flex align-center">
+          <view class="flex align-center justify-center text-center" style="width: 400rpx;">
             <picker mode="selector" :range="monthRange" :value="setting.vocationStartMonth - 1" @change="vocationStartMonthChange">
-              <view class="picker margin-right-sm">{{ setting.vocationStartMonth }}月</view>
+              <view class="picker margin-right-sm" style="text-align: center;">{{ setting.vocationStartMonth }}月</view>
             </picker>
             <text class="margin-lr-xs">至</text>
             <picker mode="selector" :range="monthRange" :value="setting.vocationEndMonth - 1" @change="vocationEndMonthChange">
-              <view class="picker margin-left-sm">{{ setting.vocationEndMonth }}月</view>
+              <view class="picker margin-left-sm" style="text-align: center;">{{ setting.vocationEndMonth }}月</view>
             </picker>
           </view>
         </view>
@@ -22,10 +26,10 @@
           <view class="cu-form-group margin-top">
             <view class="title">每月公休</view>
             <label>
-              <radio class="radio" :class="setting.vocation=='0'?'checked':''" :checked="setting.vocation=='0'?true:false" value="0"></radio>1~8日
+              <radio class="radio" :class="setting.vocation=='0'?'checked':''" :checked="setting.vocation=='0'?true:false" value="0"></radio><text class="margin-lr-xs">1~8日</text>
             </label>
             <label>
-              <radio class="radio" :class="setting.vocation=='1'?'checked':''" :checked="setting.vocation=='1'?true:false" value="1"></radio>9~16日
+              <radio class="radio" :class="setting.vocation=='1'?'checked':''" :checked="setting.vocation=='1'?true:false" value="1"></radio><text class="margin-lr-xs">9~16日</text>
             </label>
           </view>
         </radio-group>
@@ -83,3 +87,9 @@ const saveSetting = () => {
   emit('saveSetting')
 }
 </script>
+
+<style>
+	.cu-form-group picker::after {
+		content: '';
+	}
+</style>
