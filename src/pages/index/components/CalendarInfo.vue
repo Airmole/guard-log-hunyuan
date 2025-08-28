@@ -16,9 +16,9 @@
 					<view class='cu-tag bg-blue'>风力</view>
 					<view class="cu-tag line-bliue">{{checkedDay.wind}}</view>
 				</view>
-				<view v-if="checkedDay.weekday" class="cu-tag line-blue margin-lr-xs">{{checkedDay.weekday}}</view>
-				<view v-if="checkedDay.info && checkedDay.info !== '　'" class="cu-tag line-blue margin-lr-xs">{{checkedDay.info}}</view>
-				<view v-if="checkedDay.event" class="cu-tag line-blue margin-lr-xs">{{checkedDay.event}}</view>
+				<view v-if="checkedDay.weekday" class="cu-tag line-blue radius margin-lr-xs">{{checkedDay.weekday}}</view>
+				<view v-if="checkedDay.info && checkedDay.info !== '　'" class="cu-tag radius line-blue margin-lr-xs">{{checkedDay.info}}</view>
+				<view v-if="checkedDay.event" class="cu-tag line-blue radius margin-lr-xs">{{checkedDay.event}}</view>
 			</view>
 			<view class="margin-tb-xs"><hr /></view>
 			<view class="flex text-center border">
