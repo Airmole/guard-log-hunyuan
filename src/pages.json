@@ -5,6 +5,13 @@
 			"style": {
 				"navigationBarTitleText": "巡护日志生成器"
 			}
+		},
+		{
+			"path" : "pages/index/admin",
+			"style" : 
+			{
+				"navigationBarTitleText" : "数据管理"
+			}
 		}
 	],
 	"globalStyle": {
