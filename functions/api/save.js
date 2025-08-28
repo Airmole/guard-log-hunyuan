@@ -1,5 +1,5 @@
 export async function onRequestPost(context) {
-  const queryParams = await context.request.json()
+  const queryParams = context.request.json()
 
   if (!queryParams.date || !queryParams.weather) return new Response('参数填写有误', { status: 400 });
 
