@@ -36,8 +36,7 @@
 				<view class="flex-sub padding-xs">
 					<text>巡查结果：</text>
 					<view style="text-indent: 2em;">
-						<text v-if="generating && !guardLog" class="text-red">正在生成中...</text>
-						<text v-else :decode="true">{{ guardLog }}</text>
+						<text :decode="true">{{ guardLog }}</text>
 					</view>
 				</view>
 			</view>
