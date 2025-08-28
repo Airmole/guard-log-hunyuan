@@ -160,7 +160,7 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
   }
 
   // 处理恶劣天气情况
-  if (weather.includes('雨') || weather.includes('雪') || weather.includes('暴雨') || weather.includes('暴雪')) {
+  if (weather.includes('雨') || weather.includes('雪')) {
     specialInstructions += "今天因天气原因，未外出巡护，驻守管护站打扫卫生、进行政治思想学习。";
     return {
       systemPrompt,
@@ -170,13 +170,13 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
 
   // 代班情况处理
   if (isSubstitute) {
-    specialInstructions += `今日同事公休，我在完成自己管护区域巡护后，额外承担了${substituteName || '同事'}的管护区域巡护工作。`;
+    specialInstructions += `今日同事公休，我在完成自己管护区域巡护工作后，巡护了${substituteName || '同事'}的管护区域巡护工作。`;
   }
 
   // 常规巡护提示
   let element = `
   日志可包含以下元素（不必同时出现）：
-    - 巡护基本情况（如出发时间、路线等）
+    - 巡护基本情况（如出发时间等）
     - 道路情况（通畅程度、是否有清理）
     - 林区状况（野生动物活动、异常情况等）
     - 特殊发现（如清理道路枯枝落叶、冬季清理积雪等）

@@ -202,7 +202,7 @@
 				// 连接正常关闭，不需要显示错误
 				return;
 			}
-			error.value = '生成日志失败，请重试';
+			error.value = '生成日志失败，请重试' + err.toString();
 			generating.value = false;
 			eventSource.close();
 			console.error('SSE连接错误:', err);
