@@ -36,7 +36,8 @@
 				<view class="flex-sub padding-xs">
 					<text>巡查结果：</text>
 					<view style="text-indent: 2em;">
-						<text :decode="true">{{ typedLog }}</text>
+						<text v-if="!typedLog" class="text-red">正在生成中...</text>
+						<text v-else :decode="true">{{ typedLog }}</text>
 					</view>
 				</view>
 			</view>
