@@ -158,29 +158,50 @@
 
 		// 创建SSE连接
 		const eventSource = new EventSource(apiUrl);
+		let tempLog = ''; // 用于存储临时拼接的日志内容
 
-		// 监听消息事件
+		// 监听消息事件 - 处理流式返回的数据
 		eventSource.onmessage = (event) => {
 			try {
 				const data = JSON.parse(event.data);
-				if (data.status === 'success' && data.log) {
-					guardLog.value = data.log;
-				} else if (data.status === 'error' && data.error) {
+				
+				// 处理增量数据
+				if (data.type === 'delta' && data.content) {
+					tempLog += data.content;
+					guardLog.value = tempLog; // 实时更新显示
+				} 
+				// 处理完成信号
+				else if (data.type === 'end') {
+					// 可以在这里进行最终处理
+					eventSource.close();
+					generating.value = false;
+				}
+				// 处理错误信息
+				else if (data.type === 'error' && data.error) {
 					error.value = data.error;
+					eventSource.close();
+					generating.value = false;
+				}
+				// 处理一次性返回的完整日志（兼容旧版）
+				else if (data.status === 'success' && data.log) {
+					guardLog.value = data.log;
+					eventSource.close();
+					generating.value = false;
 				}
 			} catch (e) {
 				error.value = '解析日志数据失败';
 				console.error('解析SSE数据失败:', e);
+				eventSource.close();
+				generating.value = false;
 			}
-
-			// 关闭连接并重置状态
-			eventSource.close();
-			generating.value = false;
 		};
-
 
 		// 监听错误事件
 		eventSource.onerror = (err) => {
+			if (eventSource.readyState === EventSource.CLOSED) {
+				// 连接正常关闭，不需要显示错误
+				return;
+			}
 			error.value = '生成日志失败，请重试';
 			generating.value = false;
 			eventSource.close();
