@@ -177,7 +177,7 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
   let element = `
   日志可包含以下元素（不必同时出现）：
     - 巡护基本情况（如出发时间等）
-    - 道路情况（通畅程度、是否有清理，可以写道路有枯枝落叶已及时清理打扫，如果日期是12月~次年2月冬季可以写清理道路积雪）
+    - 道路情况（通畅程度、是否有清理，可以写道路有枯枝落叶已及时清理打扫）
     - 林区状况（野生动物活动、异常情况等）
     - 特殊发现（如清理道路枯枝落叶）
     - 安全检查结果（无盗猎、无火灾隐患、无病虫害等）
@@ -185,6 +185,12 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
     - 有无牛羊家畜放牧啃食林草的现象出现（只能写没有）
     - 有无发现盗猎、违法砍伐等非法行为（只能写没有）
   `;
+  
+  const month = (new Date(date)).getMonth() + 1
+  if (month >= 12 || month <= 2) {
+	  element += `
+	  - 清理沿途道路积雪`
+  }
 
   // 添加关键词
   let keywordText = '';
