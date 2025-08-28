@@ -135,7 +135,7 @@ export async function onRequest(context) {
  */
 function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, isSubstitute, keywords) {
   // 系统提示词 - 定义角色和基本要求
-  let systemPrompt = "你是一名护林员助手，负责根据提供的信息生成简洁、真实的护林员巡护日志。日志需口语化、符合实际工作场景，字数控制在100字以内，通常30-50字左右。";
+  let systemPrompt = "你是一名护林员助手，负责根据提供的信息生成简洁、真实的护林员巡护日志。符合实际工作场景，字数控制在100字以内，通常30-50字左右。";
 
   // 根据条件构建特殊提示
   let specialInstructions = "";
@@ -177,10 +177,13 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
   let element = `
   日志可包含以下元素（不必同时出现）：
     - 巡护基本情况（如出发时间等）
-    - 道路情况（通畅程度、是否有清理）
+    - 道路情况（通畅程度、是否有清理，可以写道路有枯枝落叶已及时清理打扫，如果日期是12~2月冬季可以写清理道路积雪）
     - 林区状况（野生动物活动、异常情况等）
     - 特殊发现（如清理道路枯枝落叶、冬季清理积雪等）
     - 安全检查结果（无盗猎、无火灾隐患、无病虫害等）
+    - 有无发现误野生动物活动的情况（如发现黄鼠狼、鹿、野兔、野鸡等）
+    - 有无牛羊家畜放牧啃食林草的现象出现（只能写没有）
+    - 有无发现盗猎、违法砍伐等非法行为（只能写没有）
   `;
 
   // 添加关键词
