@@ -152,7 +152,7 @@ function buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, 
   // 处理公休情况
   if (isHoliday) {
     systemPrompt += '如果公休，则只需说清楚由代班同事负责即可，无需写巡护内容。';
-    specialInstructions += `今天轮我公休，管护区的巡护工作由同事${substituteName || '代班人员'}负责代班巡护，全权负责。`;
+    specialInstructions += `今天轮我公休，我不在单位，管护区的巡护工作由同事${substituteName || '代班人员'}负责代班巡护，全权负责。`;
     return {
       systemPrompt,
       userPrompt: specialInstructions
