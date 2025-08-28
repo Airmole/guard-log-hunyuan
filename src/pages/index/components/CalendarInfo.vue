@@ -36,7 +36,7 @@
 				<view class="flex-sub padding-xs">
 					<text>巡查结果：</text>
 					<view style="text-indent: 2em;">
-						<text :decode="true">{{ guardLog }}</text>
+						<text :decode="true">{{ typedLog }}</text>
 					</view>
 				</view>
 			</view>
@@ -77,6 +77,28 @@
 	});
 
 	const guardLog = ref('');
+	const typedLog = ref('');
+	const currentIndex = ref(0);
+	const typingInterval = ref(null);
+
+	const startTyping = () => {
+		if (typingInterval.value) clearInterval(typingInterval.value);
+		currentIndex.value = 0;
+		typedLog.value = '';
+		
+		typingInterval.value = setInterval(() => {
+			if (currentIndex.value < guardLog.value.length) {
+				typedLog.value += guardLog.value.charAt(currentIndex.value);
+				currentIndex.value++;
+			} else {
+				clearInterval(typingInterval.value);
+			}
+		}, 50);
+	};
+
+	watch(guardLog, () => {
+		startTyping();
+	});
 	const generating = ref(false);
 	const error = ref('');
 	const substituteName = ref('');
