@@ -80,10 +80,10 @@
 		methods: {
 			submit () {
 				const form = this.form
+				const paramString = (new URLSearchParams(form)).toString()
 				uni.request({
-					url: `/api/save`,
+					url: `/api/save?${paramString}`,
 					method: 'POST',
-					data: form,
 					success: () => {
 						this.clearForm()
 						uni.showToast({ title: '保存成功'})
