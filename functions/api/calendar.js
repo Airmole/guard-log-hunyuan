@@ -11,6 +11,11 @@ export async function onRequest(context) {
     if (month < 10) month = '0' + month;
     month = `${year}-${month}`
   }
+  
+  const monthDate = new Date(month)
+  if ((monthDate.getFullYear() >= 2025 && monthDate.getMonth() >= 7) || monthDate.getFullYear() > 2025) {
+    month = month.replace(/-/g, '_')
+  }
 
   let clendarData = [];
   let result;

@@ -3,7 +3,7 @@ export async function onRequestPost(context) {
 
   if (!queryParams.date || !queryParams.weather) return new Response('参数填写有误', { status: 400 });
 
-  const keyname = `clendar_${queryParams.date}`
+  const keyname = `clendar_${queryParams.date.replace(/-/g, '_')}`
   const data = {
     date: queryParams.date,
     weather: queryParams.weather,
