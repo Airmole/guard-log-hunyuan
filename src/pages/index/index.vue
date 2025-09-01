@@ -106,7 +106,7 @@ onMounted(() => {
   // defaultDay.value = getFirstDayOfMonth()
   defaultDay.value = '2025-08-01'
   checkedDate.value = defaultDay.value
-  getMonthInfo()
+  getMonthInfo(checkedDate.value.substring(0, 7))
   
   // 检查是否有设置，如果没有则弹出设置弹窗
   uni.getStorage({
