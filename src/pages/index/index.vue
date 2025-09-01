@@ -97,12 +97,14 @@ const {
 } = useSetting()
 
 onBeforeMount(() => {
-  defaultDay.value = getFirstDayOfMonth()
+  // defaultDay.value = getFirstDayOfMonth()
+  defaultDay.value = '2025-08-01'
   checkedDate.value = defaultDay.value
 })
 
 onMounted(() => {
-  defaultDay.value = getFirstDayOfMonth()
+  // defaultDay.value = getFirstDayOfMonth()
+  defaultDay.value = '2025-08-01'
   checkedDate.value = defaultDay.value
   getMonthInfo()
   
