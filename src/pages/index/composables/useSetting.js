@@ -6,7 +6,7 @@ export function useSetting() {
     vocation: null,
     partner: '',
     vocationStartMonth: 6,
-    vocationEndMonth: 10
+    vocationEndMonth: 9
   })
 
   const hideSettingModal = () => {
