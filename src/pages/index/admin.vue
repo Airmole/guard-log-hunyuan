@@ -85,7 +85,6 @@
 					url: `/api/save?${paramString}`,
 					method: 'POST',
 					success: () => {
-						this.clearForm()
 						uni.showToast({ title: '保存成功'})
 					}
 				})
