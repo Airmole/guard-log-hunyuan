@@ -18,17 +18,25 @@ export async function onRequest(context) {
   }
 
   let clendarData = [];
-  let result;
-  let cursor;
-  do {
-    result = await guardlog_kv.list({ "prefix": `clendar_${month}`, "limit": 40 });
-    cursor = result.cursor;
-    for (let index = 0; index < result.keys.length; index++) {
-      const keyname = result.keys[index].key;
-      const value = await guardlog_kv.get(keyname, 'json');
-      clendarData.push(value);
-    }
-  } while (result && !result.complete);
+  try {
+    let result;
+    let cursor;
+    do {
+      result = await guardlog_kv.list({ "prefix": `clendar_${month}`, "limit": 40 });
+      cursor = result.cursor;
+      if (result.keys && result.keys.length) {
+        for (let index = 0; index < result.keys.length; index++) {
+          const keyname = result.keys[index].key;
+          const value = await guardlog_kv.get(keyname, 'json');
+          clendarData.push(value);
+        }
+      }
+    } while (result && !result.complete);
+  } catch (error) {
+    clendarData = []
+    console.log(error)
+  }
+
 
   return new Response(JSON.stringify(clendarData), {
     headers: {
