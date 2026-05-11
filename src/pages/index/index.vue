@@ -98,13 +98,13 @@ const {
 
 onBeforeMount(() => {
   // defaultDay.value = getFirstDayOfMonth()
-  defaultDay.value = '2026-03-01'
+  defaultDay.value = '2026-04-01'
   checkedDate.value = defaultDay.value
 })
 
 onMounted(() => {
   // defaultDay.value = getFirstDayOfMonth()
-  defaultDay.value = '2026-03-01'
+  defaultDay.value = '2026-04-01'
   checkedDate.value = defaultDay.value
   getMonthInfo(checkedDate.value.substring(0, 7))
   
