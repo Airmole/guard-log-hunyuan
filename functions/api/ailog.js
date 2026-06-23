@@ -241,8 +241,8 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
       ],
       max_tokens: 200,    // 限制生成字数
       temperature: 0.7,   // 控制生成内容的随机性
-      top_p: 0.9,         // 控制生成内容的多样性
-      n: 1,
+      // top_p: 0.9,         // 控制生成内容的多样性
+      // n: 1,
       stream: true        // 启用流式返回
     };
 
@@ -253,11 +253,7 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEY}` // OpenAI标准认证方式
       },
-      body: JSON.stringify(requestBody),
-      // EdgeOne Pages环境下的fetch配置
-      cf: {
-        cacheTtl: 0
-      }
+      body: JSON.stringify(requestBody)
     });
     
     // 5. 处理API响应
