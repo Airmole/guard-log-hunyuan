@@ -68,7 +68,7 @@ export async function onRequest(context) {
                   }
                 }
                 // 检查是否结束
-                if (data.finish_reason === 'stop') {
+                if (data.choices && data.choices[0] && data.choices[0].finish_reason === 'stop') {
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify({
                     type: 'end',
                     log: fullResponse.trim(),
@@ -216,21 +216,21 @@ ${element}
 }
 
 /**
- * 调用腾讯云混元大模型API生成护林员巡护日志（使用OpenAI兼容接口，支持SSE流式返回）
+ * 调用智谱GLM大模型API生成护林员巡护日志（使用OpenAI兼容接口，支持SSE流式返回）
  */
 async function generateGuardLog(context, date, weather, wind, isMeeting, isHoliday, substituteName, isSubstitute, keywords) {
   try {
     // 1. 构建提示词
     const { systemPrompt, userPrompt } = buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, isSubstitute, keywords);
 
-    // 2. 腾讯云混元大模型API配置（OpenAI兼容接口）
+    // 2. 智谱GLM大模型API配置（OpenAI兼容接口）
     const API_KEY = context.env.HUNYUAN_API_KEY;
     if (!API_KEY) {
       throw new Error('API密钥未配置，请在EdgeOne Pages控制台设置HUNYUAN_API_KEY环境变量');
     }
     
-    const API_ENDPOINT = context.env.HUNYUAN_API_ENDPOINT || 'https://free.v36.cm';
-    const MODEL_NAME = context.env.HUNYUAN_MODEL || 'gpt-3.5-turbo';
+    const API_ENDPOINT = context.env.HUNYUAN_API_ENDPOINT || 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+    const MODEL_NAME = context.env.HUNYUAN_MODEL || 'glm-4.7-flash';
 
     // 3. 构建OpenAI兼容格式的请求参数（流式调用）
     const requestBody = {
