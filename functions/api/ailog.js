@@ -229,8 +229,8 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
       throw new Error('API密钥未配置，请在EdgeOne Pages控制台设置HUNYUAN_API_KEY环境变量');
     }
     
-    const API_ENDPOINT = context.env.HUNYUAN_API_ENDPOINT || 'https://api.hunyuan.cloud.tencent.com/v1/chat/completions';
-    const MODEL_NAME = context.env.HUNYUAN_MODEL || 'hunyuan-lite';
+    const API_ENDPOINT = context.env.HUNYUAN_API_ENDPOINT || 'https://free.v36.cm';
+    const MODEL_NAME = context.env.HUNYUAN_MODEL || 'gpt-3.5-turbo';
 
     // 3. 构建OpenAI兼容格式的请求参数（流式调用）
     const requestBody = {
@@ -278,7 +278,7 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
     
     return response.body;
   } catch (error) {
-    console.error('调用混元大模型失败:', error);
+    console.error('调用大模型失败:', error);
     throw error;
   }
 }
