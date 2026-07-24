@@ -47,7 +47,7 @@
 			</view>
 
 			<view class="margin-top-xl">
-				<view class="text-center text-orange">巡护日志由腾讯混元AI大模型生成</view>
+				<view class="text-center text-orange">巡护日志由智谱GLM AI大模型生成</view>
 				<view class="text-center text-orange">请注意自行判断是否符合实际情况可用！</view>
 				
 				<view class="flex justify-center margin-top-sm">
@@ -152,7 +152,7 @@
 	/**
 	 * 生成护林员日志
 	 */
-	function generateGuardLog() {
+	async function generateGuardLog() {
 		if (!props.checkedDay || typeof props.checkedDay === 'string') {
 			error.value = '请先选择有效的日期';
 			return;
@@ -164,7 +164,6 @@
 		error.value = '';
 		generating.value = true;
 
-		// 构建API请求参数
 		const params = new URLSearchParams();
 		params.append('date', props.checkedDate);
 		params.append('weather', props.checkedDay.weather || '');
@@ -175,60 +174,25 @@
 		params.append('isSubstitute', props.checkedDay.info.includes('代班') ? 'true' : 'false');
 		params.append('keywords', props.checkedDay.event || '');
 
-		// 构建API URL
 		const apiUrl = `/api/ailog?${params.toString()}`;
 
-		// 创建SSE连接
-		const eventSource = new EventSource(apiUrl);
-		let tempLog = ''; // 用于存储临时拼接的日志内容
+		try {
+			const response = await fetch(apiUrl);
+			const data = await response.json();
 
-		// 监听消息事件 - 处理流式返回的数据
-		eventSource.onmessage = (event) => {
-			try {
-				const data = JSON.parse(event.data);
-				
-				// 处理增量数据
-				if (data.type === 'delta' && data.content) {
-					tempLog += data.content;
-					guardLog.value = tempLog; // 实时更新显示
-				} 
-				// 处理完成信号
-				else if (data.type === 'end') {
-					// 可以在这里进行最终处理
-					eventSource.close();
-					generating.value = false;
-				}
-				// 处理错误信息
-				else if (data.type === 'error' && data.error) {
-					error.value = data.error;
-					eventSource.close();
-					generating.value = false;
-				}
-				// 处理一次性返回的完整日志（兼容旧版）
-				else if (data.status === 'success' && data.log) {
-					guardLog.value = data.log;
-					eventSource.close();
-					generating.value = false;
-				}
-			} catch (e) {
-				error.value = '解析日志数据失败';
-				console.error('解析SSE数据失败:', e);
-				eventSource.close();
-				generating.value = false;
+			if (data.status === 'success' && data.log) {
+				guardLog.value = data.log;
+			} else if (data.status === 'error' && data.error) {
+				error.value = data.error;
+			} else {
+				error.value = '生成日志失败，返回数据格式错误';
 			}
-		};
-
-		// 监听错误事件
-		eventSource.onerror = (err) => {
-			if (eventSource.readyState === EventSource.CLOSED) {
-				// 连接正常关闭，不需要显示错误
-				return;
-			}
-			error.value = '生成日志失败，请重试' + err.toString();
+		} catch (e) {
+			error.value = '生成日志失败，请重试';
+			console.error('请求API失败:', e);
+		} finally {
 			generating.value = false;
-			eventSource.close();
-			console.error('SSE连接错误:', err);
-		};
+		}
 	}
 </script>
 
