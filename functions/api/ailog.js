@@ -1,4 +1,7 @@
 // EdgeOne Pages边缘函数 - 护林员巡护日志生成API
+// 对接智谱AI GLM-4.7-Flash 模型
+// API文档: https://docs.bigmodel.cn/cn/guide/develop/http/introduction
+
 export async function onRequest(context) {
   try {
     const { request } = context;
@@ -48,7 +51,9 @@ export async function onRequest(context) {
     
     return new Response(JSON.stringify({
       status: 'error',
-      error: error.message || '生成巡护日志失败'
+      error: error.message || '生成巡护日志失败',
+      errorCode: error.code || null,
+      errorDetail: error.detail || null
     }), {
       status: 500,
       headers
@@ -133,13 +138,16 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
   try {
     const { systemPrompt, userPrompt } = buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, isSubstitute, keywords);
 
-    const API_KEY = context.env.HUNYUAN_API_KEY;
+    // 智谱AI配置：环境变量请使用 ZHIPU_API_KEY
+    const API_KEY = context.env.ZHIPU_API_KEY;
     if (!API_KEY) {
-      throw new Error('API密钥未配置，请在EdgeOne Pages控制台设置HUNYUAN_API_KEY环境变量');
+      throw new Error('API密钥未配置，请在EdgeOne Pages控制台设置ZHIPU_API_KEY环境变量');
     }
     
-    const API_ENDPOINT = context.env.HUNYUAN_API_ENDPOINT || 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-    const MODEL_NAME = context.env.HUNYUAN_MODEL || 'glm-4.7-flash';
+    // 智谱AI通用API端点
+    const API_ENDPOINT = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+    // 使用 GLM-4.7-Flash 免费模型
+    const MODEL_NAME = 'glm-4.7-flash';
 
     const requestBody = {
       model: MODEL_NAME,
@@ -152,7 +160,7 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
       stream: false
     };
 
-    console.log('GLM API Request:', { endpoint: API_ENDPOINT, model: MODEL_NAME });
+    console.log('Zhipu API Request:', { endpoint: API_ENDPOINT, model: MODEL_NAME });
     
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
@@ -163,37 +171,59 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
       body: JSON.stringify(requestBody)
     });
     
-    console.log('GLM API Response Status:', response.status);
+    console.log('Zhipu API Response Status:', response.status);
     
+    // 处理非200响应 - 解析智谱错误码并返回详细信息
     if (!response.ok) {
       let errorBody = '';
       try {
-        if (response.body) {
-          errorBody = await response.text();
-        }
+        errorBody = await response.text();
       } catch (e) {
         console.error('读取错误响应体失败:', e);
       }
       
-      console.error('GLM API Error:', errorBody);
-      throw new Error(`API请求失败: ${response.status} ${response.statusText} ${errorBody}`);
+      console.error('Zhipu API Error:', errorBody);
+      
+      // 尝试解析智谱错误响应格式: {"error":{"code":"1001","message":"..."}}
+      let errorCode = null;
+      let errorMessage = errorBody;
+      try {
+        const parsedError = JSON.parse(errorBody);
+        if (parsedError.error) {
+          errorCode = parsedError.error.code || null;
+          errorMessage = parsedError.error.message || errorMessage;
+        }
+      } catch (e) {
+        // 非JSON错误响应
+      }
+      
+      const error = new Error(`智谱AI接口错误: ${errorMessage}`);
+      error.code = errorCode;
+      throw error;
     }
     
     const responseData = await response.json();
-    console.log('GLM API Response Data:', JSON.stringify(responseData).substring(0, 500));
+    console.log('Zhipu API Response Data:', JSON.stringify(responseData).substring(0, 500));
     
     if (!responseData.choices || responseData.choices.length === 0) {
-      throw new Error('API返回数据格式不正确');
+      throw new Error('智谱AI返回数据格式不正确');
     }
     
     const content = responseData.choices[0].message?.content;
     if (!content) {
-      throw new Error('API未返回内容');
+      // 检查 finish_reason 中是否有异常
+      const finishReason = responseData.choices[0]?.finish_reason;
+      if (finishReason && finishReason !== 'stop') {
+        const error = new Error(`智谱AI生成异常，finish_reason: ${finishReason}`);
+        error.code = finishReason;
+        throw error;
+      }
+      throw new Error('智谱AI未返回内容');
     }
     
     return content.trim();
   } catch (error) {
-    console.error('调用大模型失败:', error);
+    console.error('调用智谱AI失败:', error);
     throw error;
   }
 }
