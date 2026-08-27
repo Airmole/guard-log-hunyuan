@@ -48,7 +48,7 @@
 			</view>
 
 			<view class="margin-top-xl">
-				<view class="text-center text-orange">巡护日志由智谱GLM AI大模型生成</view>
+				<view class="text-center text-orange">巡护日志由讯飞星火AI大模型生成</view>
 				<view class="text-center text-orange">请注意自行判断是否符合实际情况可用！</view>
 				
 				<view class="flex justify-center margin-top-sm">
@@ -183,7 +183,7 @@
 			if (data.status === 'success' && data.log) {
 				guardLog.value = data.log;
 			} else if (data.status === 'error' && data.error) {
-				// 展示智谱AI返回的详细错误信息
+				// 展示讯飞星火返回的详细错误信息
 				let errorMsg = data.error;
 				if (data.errorCode) {
 					errorMsg = `${errorMsg}（错误码: ${data.errorCode}）`;

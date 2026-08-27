@@ -1,6 +1,6 @@
 // EdgeOne Pages边缘函数 - 护林员巡护日志生成API
-// 对接智谱AI GLM-4.7-Flash 模型
-// API文档: https://docs.bigmodel.cn/cn/guide/develop/http/introduction
+// 对接讯飞星火大模型 Spark Lite
+// API文档: https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html
 
 export async function onRequest(context) {
   try {
@@ -138,16 +138,16 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
   try {
     const { systemPrompt, userPrompt } = buildPrompt(date, weather, wind, isMeeting, isHoliday, substituteName, isSubstitute, keywords);
 
-    // 智谱AI配置：环境变量请使用 ZHIPU_API_KEY
-    const API_KEY = context.env.ZHIPU_API_KEY;
+    // 讯飞星火配置：环境变量请使用 SPARK_API_KEY
+    const API_KEY = context.env.SPARK_API_KEY;
     if (!API_KEY) {
-      throw new Error('API密钥未配置，请在EdgeOne Pages控制台设置ZHIPU_API_KEY环境变量');
+      throw new Error('API密钥未配置，请在EdgeOne Pages控制台设置SPARK_API_KEY环境变量');
     }
     
-    // 智谱AI通用API端点
-    const API_ENDPOINT = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-    // 使用 GLM-4.7-Flash 免费模型
-    const MODEL_NAME = 'glm-4.7-flash';
+    // 讯飞星火HTTP接口端点
+    const API_ENDPOINT = 'https://spark-api-open.xf-yun.com/v1/chat/completions';
+    // 使用 Spark Lite 模型
+    const MODEL_NAME = 'lite';
 
     const requestBody = {
       model: MODEL_NAME,
@@ -160,7 +160,7 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
       stream: false
     };
 
-    console.log('Zhipu API Request:', { endpoint: API_ENDPOINT, model: MODEL_NAME });
+    console.log('Spark API Request:', { endpoint: API_ENDPOINT, model: MODEL_NAME });
     
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
@@ -171,9 +171,9 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
       body: JSON.stringify(requestBody)
     });
     
-    console.log('Zhipu API Response Status:', response.status);
+    console.log('Spark API Response Status:', response.status);
     
-    // 处理非200响应 - 解析智谱错误码并返回详细信息
+    // 处理非200响应 - 解析讯飞星火错误码并返回详细信息
     if (!response.ok) {
       let errorBody = '';
       try {
@@ -182,9 +182,9 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
         console.error('读取错误响应体失败:', e);
       }
       
-      console.error('Zhipu API Error:', errorBody);
+      console.error('Spark API Error:', errorBody);
       
-      // 尝试解析智谱错误响应格式: {"error":{"code":"1001","message":"..."}}
+      // 尝试解析讯飞星火错误响应格式
       let errorCode = null;
       let errorMessage = errorBody;
       try {
@@ -192,38 +192,43 @@ async function generateGuardLog(context, date, weather, wind, isMeeting, isHolid
         if (parsedError.error) {
           errorCode = parsedError.error.code || null;
           errorMessage = parsedError.error.message || errorMessage;
+        } else if (parsedError.message) {
+          errorMessage = parsedError.message;
+          if (parsedError.code) {
+            errorCode = parsedError.code;
+          }
         }
       } catch (e) {
         // 非JSON错误响应
       }
       
-      const error = new Error(`智谱AI接口错误: ${errorMessage}`);
+      const error = new Error(`讯飞星火接口错误: ${errorMessage}`);
       error.code = errorCode;
       throw error;
     }
     
     const responseData = await response.json();
-    console.log('Zhipu API Response Data:', JSON.stringify(responseData).substring(0, 500));
+    console.log('Spark API Response Data:', JSON.stringify(responseData).substring(0, 500));
+    
+    // 讯飞星火非流式响应格式: { code: 0, message: "Success", choices: [{ message: { role: "assistant", content: "..." }, index: 0 }] }
+    if (responseData.code !== undefined && responseData.code !== 0) {
+      const error = new Error(`讯飞星火接口错误: ${responseData.message || '未知错误'}`);
+      error.code = responseData.code;
+      throw error;
+    }
     
     if (!responseData.choices || responseData.choices.length === 0) {
-      throw new Error('智谱AI返回数据格式不正确');
+      throw new Error('讯飞星火返回数据格式不正确');
     }
     
     const content = responseData.choices[0].message?.content;
     if (!content) {
-      // 检查 finish_reason 中是否有异常
-      const finishReason = responseData.choices[0]?.finish_reason;
-      if (finishReason && finishReason !== 'stop') {
-        const error = new Error(`智谱AI生成异常，finish_reason: ${finishReason}`);
-        error.code = finishReason;
-        throw error;
-      }
-      throw new Error('智谱AI未返回内容');
+      throw new Error('讯飞星火未返回内容');
     }
     
     return content.trim();
   } catch (error) {
-    console.error('调用智谱AI失败:', error);
+    console.error('调用讯飞星火失败:', error);
     throw error;
   }
 }
